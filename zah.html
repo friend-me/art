@@ -9,14 +9,13 @@
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin: 0;
+            padding: 2rem;
         }
 
         .stickman {
             stroke: #2d3748;
-            stroke-width: 4;
+            stroke-width: 6;
             stroke-linecap: round;
             fill: none;
         }
@@ -29,51 +28,161 @@
             fill: #ffffff;
             font-family: sans-serif;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 24px;
             text-anchor: middle;
             dominant-baseline: central;
             user-select: none;
         }
+
+        .category-btn {
+            transition: all 0.2s ease;
+        }
+
+        .category-btn.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .skill-preview-btn {
+            transition: all 0.2s ease;
+        }
+
+        .skill-preview-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
-    <div class="flex flex-col items-center gap-8">
-        <h1 class="text-4xl font-bold text-gray-800 tracking-wide">（普通）后室者 · ZAH</h1>
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-4xl font-bold text-gray-800 text-center mb-8 tracking-wide">后室角色选择</h1>
         
-        <div class="bg-white rounded-2xl shadow-xl p-8">
-            <!-- 正常成年人站立比例：约7.5头身 -->
-            <!-- 头高单位：50px，中心(120,60) -->
-            <svg width="240" height="420" viewBox="0 0 240 420">
-                <!-- 头部（涂黑） -->
-                <circle class="stickman stickman-head" id="head" cx="120" cy="60" r="25"/>
-                <!-- 脸上白色编号67 -->
-                <text class="face-number" id="face-text" x="120" y="60">67</text>
-                
-                <!-- 颈部 -->
-                <line class="stickman" id="neck" x1="120" y1="85" x2="120" y2="100"/>
-                
-                <!-- 躯干：肩到胯（约2.5头身） -->
-                <line class="stickman" id="body" x1="120" y1="100" x2="120" y2="225"/>
-                
-                <!-- 左手臂：上臂 + 前臂 -->
-                <line class="stickman" id="left-arm" x1="120" y1="110" x2="75" y2="180"/>
-                <line class="stickman" id="left-forearm" x1="75" y1="180" x2="60" y2="245"/>
-                
-                <!-- 右手臂：上臂 + 前臂 -->
-                <line class="stickman" id="right-arm" x1="120" y1="110" x2="165" y2="180"/>
-                <line class="stickman" id="right-forearm" x1="165" y1="180" x2="180" y2="245"/>
-                
-                <!-- 左腿：大腿 + 小腿 -->
-                <line class="stickman" id="left-thigh" x1="120" y1="225" x2="90" y2="310"/>
-                <line class="stickman" id="left-leg" x1="90" y1="310" x2="80" y2="390"/>
-                
-                <!-- 右腿：大腿 + 小腿 -->
-                <line class="stickman" id="right-thigh" x1="120" y1="225" x2="150" y2="310"/>
-                <line class="stickman" id="right-leg" x1="150" y1="310" x2="160" y2="390"/>
-            </svg>
-        </div>
+        <div class="flex gap-8">
+            <!-- 左侧分类选择栏 -->
+            <div class="w-48 flex flex-col gap-4">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">皮肤分类</h2>
+                <button id="btn-normal" class="category-btn active py-3 px-4 rounded-lg border-2 border-gray-300 text-lg font-medium bg-white text-gray-700">普通</button>
+                <button id="btn-limited" class="category-btn py-3 px-4 rounded-lg border-2 border-gray-300 text-lg font-medium bg-white text-gray-700">限定</button>
+                <button id="btn-god" class="category-btn py-3 px-4 rounded-lg border-2 border-gray-300 text-lg font-medium bg-white text-gray-700">神明</button>
+            </div>
 
-        <p class="text-gray-500 text-sm">基于火柴人模板制作 · 黑脸编号67 · （普通）后室者 · ZAH</p>
+            <!-- 右侧内容区 -->
+            <div class="flex-1">
+                <!-- 普通皮肤内容（默认显示） -->
+                <div id="normal-content">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 flex gap-8 items-start">
+                        <!-- 火柴人 -->
+                        <div class="flex-shrink-0">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">（普通）后室者 · ZAH</h2>
+                            <svg width="240" height="420" viewBox="0 0 240 420">
+                                <!-- 头部（涂黑） -->
+                                <circle class="stickman stickman-head" id="head" cx="120" cy="60" r="25"/>
+                                <!-- 脸上白色编号67 -->
+                                <text class="face-number" id="face-text" x="120" y="60">67</text>
+                                
+                                <!-- 颈部 -->
+                                <line class="stickman" id="neck" x1="120" y1="85" x2="120" y2="100"/>
+                                
+                                <!-- 躯干：肩到胯（约2.5头身） -->
+                                <line class="stickman" id="body" x1="120" y1="100" x2="120" y2="225"/>
+                                
+                                <!-- 左手臂：上臂 + 前臂 -->
+                                <line class="stickman" id="left-arm" x1="120" y1="110" x2="75" y2="180"/>
+                                <line class="stickman" id="left-forearm" x1="75" y1="180" x2="60" y2="245"/>
+                                
+                                <!-- 右手臂：上臂 + 前臂 -->
+                                <line class="stickman" id="right-arm" x1="120" y1="110" x2="165" y2="180"/>
+                                <line class="stickman" id="right-forearm" x1="165" y1="180" x2="180" y2="245"/>
+                                
+                                <!-- 左腿：大腿 + 小腿 -->
+                                <line class="stickman" id="left-thigh" x1="120" y1="225" x2="90" y2="310"/>
+                                <line class="stickman" id="left-leg" x1="90" y1="310" x2="80" y2="390"/>
+                                
+                                <!-- 右腿：大腿 + 小腿 -->
+                                <line class="stickman" id="right-thigh" x1="120" y1="225" x2="150" y2="310"/>
+                                <line class="stickman" id="right-leg" x1="150" y1="310" x2="160" y2="390"/>
+                            </svg>
+                        </div>
+
+                        <!-- 属性面板 -->
+                        <div class="flex-1">
+                            <div class="space-y-3 text-lg text-gray-700 mb-6">
+                                <p><span class="font-bold text-xl">ZAH</span></p>
+                                <p>犇气：<span class="font-semibold text-amber-600">225</span></p>
+                                <p>普攻：<span class="font-semibold text-red-600">9.5</span></p>
+                                <p>血量：<span class="font-semibold text-green-600">250</span></p>
+                                <p>移速：<span class="font-semibold text-blue-600">5</span></p>
+                                
+                                <div class="mt-4 space-y-3 pt-2 border-t border-gray-200">
+                                    <p><span class="font-semibold">一技能：召唤怪物</span>：随机召唤一个后室的怪物为你战斗，消耗65犇气</p>
+                                    <p><span class="font-semibold">二技能：后室编程</span>：用电脑将地图变为一个后室迷宫（自己有地图），迷宫内有各种陷阱，持续15秒，消耗125犇气</p>
+                                    <p><span class="font-semibold">三技能：怪物军团</span>：指定一个点，在点上每35秒就召唤一只怪物，消耗175犇气</p>
+                                </div>
+                            </div>
+
+                            <!-- 技能预览按钮区 -->
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <h3 class="text-lg font-semibold text-gray-700 mb-3">技能特效预览</h3>
+                                <div class="flex flex-wrap gap-3">
+                                    <button class="skill-preview-btn py-2 px-4 bg-indigo-100 text-indigo-700 rounded-lg font-medium hover:bg-indigo-200">预览一技能</button>
+                                    <button class="skill-preview-btn py-2 px-4 bg-purple-100 text-purple-700 rounded-lg font-medium hover:bg-purple-200">预览二技能</button>
+                                    <button class="skill-preview-btn py-2 px-4 bg-rose-100 text-rose-700 rounded-lg font-medium hover:bg-rose-200">预览三技能</button>
+                                </div>
+                                <p class="text-gray-400 text-sm mt-2">特效开发中，敬请期待</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 限定/神明皮肤提示内容 -->
+                <div id="error-content" class="hidden">
+                    <div class="bg-white rounded-2xl shadow-xl p-12 flex items-center justify-center min-h-[500px]">
+                        <div class="text-center">
+                            <p class="text-3xl font-bold text-red-500 leading-relaxed">根本就没有这样的皮肤！<br>不是我怕了</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        // 分类切换逻辑
+        const btnNormal = document.getElementById('btn-normal');
+        const btnLimited = document.getElementById('btn-limited');
+        const btnGod = document.getElementById('btn-god');
+        const normalContent = document.getElementById('normal-content');
+        const errorContent = document.getElementById('error-content');
+
+        function setActive(activeBtn) {
+            [btnNormal, btnLimited, btnGod].forEach(btn => btn.classList.remove('active'));
+            activeBtn.classList.add('active');
+        }
+
+        btnNormal.addEventListener('click', () => {
+            setActive(btnNormal);
+            normalContent.classList.remove('hidden');
+            errorContent.classList.add('hidden');
+        });
+
+        btnLimited.addEventListener('click', () => {
+            setActive(btnLimited);
+            normalContent.classList.add('hidden');
+            errorContent.classList.remove('hidden');
+        });
+
+        btnGod.addEventListener('click', () => {
+            setActive(btnGod);
+            normalContent.classList.add('hidden');
+            errorContent.classList.remove('hidden');
+        });
+
+        // 技能预览按钮点击提示
+        document.querySelectorAll('.skill-preview-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                alert('技能特效正在开发中，后续版本将上线动画效果！');
+            });
+        });
+    </script>
 </body>
 </html>
