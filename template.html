@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>火柴人</title>
+    <script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stickman {
+            stroke: #2d3748;
+            stroke-width: 4;
+            stroke-linecap: round;
+            fill: none;
+        }
+
+        .stickman-head {
+            fill: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex flex-col items-center gap-8">
+        <h1 class="text-4xl font-bold text-gray-800 tracking-wide">火柴人</h1>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <!-- 正常成年人站立比例：约7.5头身 -->
+            <!-- 头高单位：50px，中心(120,60) -->
+            <svg width="240" height="420" viewBox="0 0 240 420">
+                <!-- 头部（1头身） -->
+                <circle class="stickman stickman-head" id="head" cx="120" cy="60" r="25"/>
+                
+                <!-- 颈部 -->
+                <line class="stickman" id="neck" x1="120" y1="85" x2="120" y2="100"/>
+                
+                <!-- 躯干：肩到胯（约2.5头身） -->
+                <line class="stickman" id="body" x1="120" y1="100" x2="120" y2="225"/>
+                
+                <!-- 左手臂：上臂 + 前臂 -->
+                <line class="stickman" id="left-arm" x1="120" y1="110" x2="75" y2="180"/>
+                <line class="stickman" id="left-forearm" x1="75" y1="180" x2="60" y2="245"/>
+                
+                <!-- 右手臂：上臂 + 前臂 -->
+                <line class="stickman" id="right-arm" x1="120" y1="110" x2="165" y2="180"/>
+                <line class="stickman" id="right-forearm" x1="165" y1="180" x2="180" y2="245"/>
+                
+                <!-- 左腿：大腿 + 小腿 -->
+                <line class="stickman" id="left-thigh" x1="120" y1="225" x2="90" y2="310"/>
+                <line class="stickman" id="left-leg" x1="90" y1="310" x2="80" y2="390"/>
+                
+                <!-- 右腿：大腿 + 小腿 -->
+                <line class="stickman" id="right-thigh" x1="120" y1="225" x2="150" y2="310"/>
+                <line class="stickman" id="right-leg" x1="150" y1="310" x2="160" y2="390"/>
+            </svg>
+        </div>
+
+        <p class="text-gray-500 text-sm">正常人体比例（约7.5头身），各部位独立分组，可直接添加动画</p>
+    </div>
+</body>
+</html>
