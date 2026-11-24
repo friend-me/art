@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>（普通）后室者 · ZAH — 3D 测试场</title>
+<script src="https://aisearch-task.bj.bcebos.com/static/tailwindcss-3.4.17.js"></script>
+<style>
+    :root{
+        --ink:#141a22;
+        --ink2:#37455a;
+        --muted:#71818f;
+        --line:#dde5ee;
+        --card:#ffffff;
+        --silver:#cfdaea;
+        --accent:#3b5bdb;
+        --qi:#17a89a;
+        --danger:#e0455a;
+        --void:#090c11;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+        margin:0;
+        font-family:'PingFang SC','HarmonyOS Sans SC','Microsoft YaHei',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+        color:var(--ink);
+        background:
+            radial-gradient(1100px 560px at 8% -12%, #e9f1fc 0%, rgba(233,241,252,0) 62%),
+            radial-gradient(880px 520px at 102% 2%, #f3ecff 0%, rgba(243,236,255,0) 58%),
+            linear-gradient(160deg,#f8fafd 0%,#eef2f8 100%);
+        overflow:hidden;
+    }
+    .app{ display:flex; height:100vh; }
+
+    /* ============ 侧栏 ============ */
+    .panel{
+        width:392px; flex:0 0 392px; height:100%; overflow-y:auto;
+        background:rgba(255,255,255,.88);
+        backdrop-filter:blur(16px);
+        border-right:1px solid var(--line);
+        padding:26px 22px 44px;
+    }
+    .panel::-webkit-scrollbar{ width:9px; }
+    .panel::-webkit-scrollbar-thumb{ background:#d3dde9; border-radius:9px; }
+
+    .eyebrow{
+        margin:0 0 6px; font-size:12px; font-weight:700; letter-spacing:.22em;
+        text-transform:uppercase; color:#8598ad;
+    }
+    .title{
+        margin:0 0 6px;
+        font-family:'Songti SC','STSong','SimSun',Georgia,serif;
+        font-size:38px; line-height:1.05; font-weight:800; letter-spacing:-.5px;
+        color:var(--ink);
+    }
+    .title span{ color:var(--accent); }
+    .sub{ margin:0 0 22px; font-size:13px; color:var(--muted); letter-spacing:.04em; }
+
+    .block{ margin-bottom:22px; }
+    .block-title{
+        margin:0 0 12px; font-size:16px; font-weight:700; color:var(--ink2);
+        display:flex; align-items:center; gap:8px;
+    }
+    .block-title::before{
+        content:""; width:4px; height:15px; border-radius:3px; background:var(--accent);
+    }
+
+    .cat-row{ display:flex; gap:9px; }
+    .cat-btn{
+        flex:1; padding:11px 8px; border-radius:11px; cursor:pointer;
+        font-size:15px; font-weight:600; font-family:inherit;
+        background:#f5f8fc; color:var(--ink2);
+        border:1.5px solid var(--line);
+        transition:transform .16s ease, background .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+    }
+    .cat-btn:hover{ transform:translateY(-2px); border-color:#b9c9de; box-shadow:0 6px 16px rgba(28,48,80,.1); }
+    .cat-btn.is-active{
+        background:linear-gradient(135deg,#3b5bdb,#5b7bf0); color:#fff;
+        border-color:#3b5bdb; box-shadow:0 8px 20px rgba(59,91,219,.32);
+    }
+
+    .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:14px; }
+    .stat{
+        background:#f7fafd; border:1px solid var(--line); border-radius:11px;
+        padding:9px 11px; display:flex; flex-direction:column; gap:3px;
+    }
+    .stat .k{ font-size:12px; color:var(--muted); letter-spacing:.08em; }
+    .stat .v{ font-size:19px; font-weight:800; letter-spacing:-.3px; color:var(--ink); }
+    .stat.q .v{ color:var(--qi); }
+    .stat.a .v{ color:#d9534f; }
+    .stat.h .v{ color:#2f9e63; }
+    .stat.s .v{ color:#3b6fd4; }
+
+    .skill-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px; }
+    .skill-list li{
+        background:#fbfdff; border:1px solid var(--line); border-left:3px solid #9fb4d0;
+        border-radius:9px; padding:9px 12px; font-size:14px; line-height:1.6; color:var(--ink2);
+    }
+    .skill-list li b{ color:var(--ink); }
+    .skill-list li .cost{
+        display:inline-block; margin-left:6px; padding:1px 7px; border-radius:999px;
+        font-size:12px; font-weight:700; color:#0e7c72; background:rgba(23,168,154,.12);
+    }
+
+    .keys{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+    .keys li{ font-size:14px; color:var(--ink2); display:flex; gap:9px; align-items:center; }
+    .kbd{
+        display:inline-block; min-width:34px; text-align:center;
+        padding:2px 8px; border-radius:6px; font-size:12px; font-weight:700;
+        font-family:'SF Mono',Menlo,Consolas,monospace;
+        background:#eef3f9; border:1px solid #cdd9e8; border-bottom-width:2px; color:#3c4d63;
+    }
+
+    .btn-wide{
+        width:100%; padding:12px; border-radius:11px; cursor:pointer; font-family:inherit;
+        font-size:15px; font-weight:700; color:#fff; border:none;
+        background:linear-gradient(135deg,#2c3a52,#4a5f80);
+        transition:transform .16s ease, box-shadow .16s ease, filter .16s ease;
+    }
+    .btn-wide:hover{ transform:translateY(-2px); box-shadow:0 8px 18px rgba(30,44,66,.26); filter:brightness(1.08); }
+    .note{ margin:10px 0 0; font-size:12px; line-height:1.7; color:var(--muted); }
+
+    /* ============ 3D 舞台 ============ */
+    .stage{ position:relative; flex:1; min-width:0; background:var(--void); overflow:hidden; }
+    #scene{ display:block; width:100%; height:100%; }
+
+    .hud{ position:absolute; z-index:6; pointer-events:none; }
+    .hud-tl{ left:18px; top:18px; }
+    .hud-tr{ right:18px; top:18px; }
+
+    .qi-card{
+        min-width:236px; padding:12px 14px; border-radius:13px;
+        background:rgba(10,15,22,.62); backdrop-filter:blur(10px);
+        border:1px solid rgba(146,180,226,.24);
+        box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    .card-label{
+        font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+        color:#8fa8c6; margin-bottom:6px;
+    }
+    .qi-name{ font-size:17px; font-weight:800; color:#eaf2ff; letter-spacing:.02em; margin-bottom:7px; }
+    .qi-name em{ font-style:normal; color:#9fd8ff; font-size:12px; letter-spacing:.16em; margin-left:6px; }
+    .bar{ position:relative; height:9px; border-radius:999px; background:rgba(255,255,255,.12); overflow:hidden; }
+    .bar-fill{ position:absolute; left:0; top:0; bottom:0; border-radius:999px; transition:width .18s ease, background .18s ease; }
+    .qi-fill{ background:linear-gradient(90deg,#12a396,#5be0cd); }
+    .qi-num{ margin-top:7px; font-size:13px; color:#bfd3ec; font-family:'SF Mono',Menlo,Consolas,monospace; }
+
+    .hp-card{
+        min-width:214px; padding:12px 14px; border-radius:13px;
+        background:rgba(10,15,22,.62); backdrop-filter:blur(10px);
+        border:1px solid rgba(226,160,170,.26);
+        box-shadow:0 10px 30px rgba(0,0,0,.35);
+        text-align:right;
+    }
+    .hp-value{ font-size:30px; font-weight:800; color:#ffdfe6; letter-spacing:-.5px; line-height:1.1; font-family:'SF Mono',Menlo,Consolas,monospace; }
+    .hp-value.neg{ color:#c79bff; }
+    .hp-unit{ font-size:12px; font-weight:700; color:#9fb2c8; margin-left:5px; letter-spacing:.14em; }
+    .hp-fill{ background:linear-gradient(90deg,#ff5e78,#ff9aa9); }
+    .hp-fill.neg{ background:linear-gradient(90deg,#7d4bd6,#b98bff); }
+    .hp-sub{ margin-top:7px; font-size:12px; color:#a9bccf; letter-spacing:.06em; }
+
+    .tag{
+        display:inline-block; margin-top:9px; padding:6px 12px; border-radius:999px;
+        font-size:12.5px; font-weight:600; color:#cfe4ff;
+        background:rgba(12,18,26,.7); border:1px solid rgba(146,180,226,.28);
+        backdrop-filter:blur(8px);
+    }
+    .tag b{ color:#fff; font-family:'SF Mono',Menlo,Consolas,monospace; }
+
+    .hud-bl{ left:18px; bottom:20px; }
+    .log-card{
+        width:238px; padding:11px 13px; border-radius:13px;
+        background:rgba(10,15,22,.58); backdrop-filter:blur(10px);
+        border:1px solid rgba(146,180,226,.22);
+        box-shadow:0 10px 28px rgba(0,0,0,.34);
+    }
+    .log-card ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:5px; }
+    .log-card li{
+        display:flex; justify-content:space-between; gap:10px;
+        font-size:12.5px; color:#b6cae3; letter-spacing:.02em;
+    }
+    .log-card li b{ color:#eaf3ff; font-family:'SF Mono',Menlo,Consolas,monospace; font-weight:700; }
+
+    .skillbar{
+        position:absolute; left:50%; bottom:20px; transform:translateX(-50%);
+        z-index:7; display:flex; gap:10px; padding:10px; border-radius:16px;
+        background:rgba(9,13,19,.6); backdrop-filter:blur(12px);
+        border:1px solid rgba(146,180,226,.2);
+        box-shadow:0 14px 36px rgba(0,0,0,.4);
+    }
+    .slot{
+        width:98px; padding:9px 8px 8px; border-radius:11px; cursor:pointer;
+        display:flex; flex-direction:column; align-items:center; gap:4px;
+        font-family:inherit; color:#dbe7f7;
+        background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.03));
+        border:1px solid rgba(160,192,232,.22);
+        transition:transform .14s ease, background .14s ease, border-color .14s ease, opacity .14s ease;
+    }
+    .slot:hover{ transform:translateY(-3px); background:linear-gradient(160deg,rgba(180,214,255,.2),rgba(180,214,255,.06)); border-color:rgba(190,218,255,.5); }
+    .slot svg{ color:#c3d8f5; }
+    .slot-key{ font-size:10.5px; font-weight:700; letter-spacing:.1em; color:#8fa8c6; font-family:'SF Mono',Menlo,Consolas,monospace; }
+    .slot-name{ font-size:12.5px; font-weight:700; text-align:center; line-height:1.25; }
+    .slot-cost{ font-size:11px; font-weight:700; color:#63d8c8; }
+    .slot.lack{ opacity:.44; }
+    .slot.lack .slot-cost{ color:#ff8fa0; }
+    .slot.armed{ border-color:#8fd8ff; background:linear-gradient(160deg,rgba(140,214,255,.28),rgba(140,214,255,.08)); }
+
+    .aim-hint{
+        position:absolute; left:50%; top:20px; transform:translateX(-50%); z-index:9;
+        padding:8px 16px; border-radius:999px; font-size:13.5px; font-weight:600; color:#e8f4ff;
+        background:rgba(12,20,30,.78); border:1px solid rgba(143,216,255,.45);
+        box-shadow:0 8px 24px rgba(0,0,0,.4);
+    }
+    .aim-hint[hidden]{ display:none; }
+
+    .toast{
+        position:absolute; left:50%; bottom:96px; transform:translate(-50%,14px);
+        z-index:20; padding:10px 20px; border-radius:999px; pointer-events:none;
+        font-size:14.5px; font-weight:600; color:#e9f2ff;
+        background:rgba(12,18,26,.9); border:1px solid rgba(160,192,232,.36);
+        opacity:0; transition:opacity .24s ease, transform .24s ease;
+    }
+    .toast.show{ opacity:1; transform:translate(-50%,0); }
+
+    .fx-layer{ position:absolute; inset:0; z-index:8; pointer-events:none; overflow:hidden; }
+    .dmg{
+        position:absolute; transform:translate(-50%,-50%); font-weight:900;
+        font-size:19px; letter-spacing:.4px; white-space:nowrap;
+        text-shadow:0 2px 12px rgba(0,0,0,.75);
+    }
+    .dmg-hit{ color:#eaf3ff; }
+    .dmg-skill{ color:#bcd9ff; font-size:27px; }
+    .dmg-heal{ color:#7ff0c0; }
+
+    .lock-view{
+        position:absolute; inset:0; z-index:30;
+        display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+        text-align:center; padding:28px;
+        background:
+            radial-gradient(760px 420px at 50% 18%, #ffffff 0%, rgba(255,255,255,0) 70%),
+            linear-gradient(160deg,#f8fafd,#e9eef6);
+    }
+    .lock-view[hidden]{ display:none; }
+    .lock-mark{
+        font-size:13px; font-weight:800; letter-spacing:.3em; color:#9aa9bb;
+    }
+    .lock-main{
+        margin:0; font-size:34px; line-height:1.35; font-weight:900; color:var(--danger);
+    }
+    .lock-sub{ margin:0; font-size:19px; font-weight:700; color:#7a8ba0; letter-spacing:.06em; }
+
+    @media (max-width:1023px){
+        body{ overflow:auto; }
+        .app{ flex-direction:column; height:auto; min-height:100vh; }
+        .panel{ width:100%; flex:none; height:auto; border-right:none; border-bottom:1px solid var(--line); }
+        .title{ font-size:31px; }
+        .stage{ height:64vh; min-height:430px; }
+    }
+    @media (max-width:640px){
+        .panel{ padding:20px 16px 32px; }
+        .skillbar{ gap:7px; padding:8px; }
+        .slot{ width:74px; }
+        .slot-name{ font-size:11px; }
+        .hp-value{ font-size:24px; }
+        .qi-card,.hp-card{ min-width:0; }
+        .lock-main{ font-size:24px; }
+        .lock-sub{ font-size:16px; }
+        .hud-bl{ display:none; }
+    }
+</style>
+</head>
+<body>
+<div class="app">
+    <!-- ================= 侧栏 ================= -->
+    <aside class="panel">
+        <p class="eyebrow">Backrooms · Entity Lab</p>
+        <h1 class="title">后室角色<span>选择</span></h1>
+        <p class="sub">3D 测试场 · 后室者 ZAH</p>
+
+        <section class="block">
+            <h2 class="block-title">皮肤分类</h2>
+            <div class="cat-row" id="catRow">
+                <button class="cat-btn is-active" data-cat="normal" aria-pressed="true">普通</button>
+                <button class="cat-btn" data-cat="limited" aria-pressed="false">限定</button>
+                <button class="cat-btn" data-cat="god" aria-pressed="false">神明</button>
+            </div>
+        </section>
+
+        <section class="block" id="normalPanel">
+            <h2 class="block-title">（普通）后室者 · ZAH</h2>
+            <div class="stat-grid">
+                <div class="stat q"><span class="k">犇气</span><span class="v">225</span></div>
+                <div class="stat a"><span class="k">普攻</span><span class="v">9.5</span></div>
+                <div class="stat h"><span class="k">血量</span><span class="v">250</span></div>
+                <div class="stat s"><span class="k">移速</span><span class="v">5</span></div>
+            </div>
+
+            <ul class="skill-list">
+                <li><b>一技能 · 召唤怪物</b>：随机召唤一个后室的怪物为你战斗<span class="cost">65 犇气</span></li>
+                <li><b>二技能 · 后室编程</b>：用电脑将地图变为一个后室迷宫（自己有地图），迷宫内有各种陷阱，持续 15 秒<span class="cost">125 犇气</span></li>
+                <li><b>三技能 · 怪物军团</b>：指定一个点，在点上每 35 秒就召唤一只怪物<span class="cost">175 犇气</span></li>
+            </ul>
+        </section>
+
+        <section class="block">
+            <h2 class="block-title">操作方式</h2>
+            <ul class="keys">
+                <li><span class="kbd">W A S D</span><span>或方向键，平面四向移动</span></li>
+                <li><span class="kbd">Space</span><span>跳跃，可跳上悬浮台</span></li>
+                <li><span class="kbd">滚轮</span><span>调整角色显示大小（移动时会自动小一点）</span></li>
+                <li><span class="kbd">J</span><span>或鼠标左键，普攻 9.5</span></li>
+                <li><span class="kbd">1 2 3</span><span>释放三个技能</span></li>
+                <li><span class="kbd">Esc</span><span>取消选点模式</span></li>
+            </ul>
+            <p class="note">测试场内有障碍柱、悬浮台、阶梯等地势，还有一只血量 1000 的稻草人，血量可以被扣到负数。犇气会缓慢自动恢复。</p>
+            <div style="margin-top:14px;">
+                <button class="btn-wide" id="btnReset">重置场景（血量 / 犇气 / 怪物）</button>
+            </div>
+        </section>
+    </aside>
+
+    <!-- ================= 3D 舞台 ================= -->
+    <main class="stage" id="stage">
+        <canvas id="scene"></canvas>
+
+        <div class="hud hud-tl">
+            <div class="qi-card">
+                <div class="card-label">Entity</div>
+                <div class="qi-name">ZAH<em>后室者</em></div>
+                <div class="bar"><div class="bar-fill qi-fill" id="qiFill" style="width:100%"></div></div>
+                <div class="qi-num" id="qiNum">225 / 225</div>
+            </div>
+            <div id="mazeTag" class="tag" hidden>后室编程中 · 剩余 <b id="mazeSec">15</b> s</div>
+        </div>
+
+        <div class="hud hud-tr">
+            <div class="hp-card">
+                <div class="card-label" style="text-align:right">Test Dummy</div>
+                <div class="hp-value" id="hpNumWrap"><span id="hpNum">1000.0</span><span class="hp-unit">HP</span></div>
+                <div class="bar" style="margin-top:8px"><div class="bar-fill hp-fill" id="hpFill" style="width:100%"></div></div>
+                <div class="hp-sub" id="hpState">状态：待机</div>
+            </div>
+        </div>
+
+        <div class="skillbar">
+            <button class="slot" data-act="atk">
+                <svg class="w-[20px] h-[20px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 3l7 18M11 3l3 18M18 4l2 16"/></svg>
+                <span class="slot-key">J / LMB</span>
+                <span class="slot-name">普攻</span>
+                <span class="slot-cost">9.5 伤害</span>
+            </button>
+            <button class="slot" data-act="s1">
+                <svg class="w-[20px] h-[20px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="11" r="6.4"/><circle cx="9.6" cy="10" r="1.2" fill="currentColor" stroke="none"/><circle cx="14.4" cy="10" r="1.2" fill="currentColor" stroke="none"/><path d="M6 20l1.6-3M18 20l-1.6-3"/></svg>
+                <span class="slot-key">1</span>
+                <span class="slot-name">召唤怪物</span>
+                <span class="slot-cost">65 犇气</span>
+            </button>
+            <button class="slot" data-act="s2">
+                <svg class="w-[20px] h-[20px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="1.6"/><path d="M6 8h5M6 12h9M3 20h6M15 20h6"/></svg>
+                <span class="slot-key">2</span>
+                <span class="slot-name">后室编程</span>
+                <span class="slot-cost">125 犇气</span>
+            </button>
+            <button class="slot" data-act="s3">
+                <svg class="w-[20px] h-[20px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="5" r="2.2"/><circle cx="5" cy="18" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M12 7.2v4.4M12 11.6L6.4 16M12 11.6L17.6 16"/></svg>
+                <span class="slot-key">3</span>
+                <span class="slot-name">怪物军团</span>
+                <span class="slot-cost">175 犇气</span>
+            </button>
+        </div>
+
+        <div class="hud hud-bl">
+            <div class="log-card">
+                <div class="card-label">战斗记录</div>
+                <ul id="logList"><li><span>等待指令</span><b>--</b></li></ul>
+            </div>
+        </div>
+
+        <div class="aim-hint" id="aimHint" hidden>选点模式 · 点击地面放置召唤点（Esc 取消）</div>
+        <div class="toast" id="toast"></div>
+        <div class="fx-layer" id="fxLayer"></div>
+
+        <div class="lock-view" id="lockView" hidden>
+            <div class="lock-mark">SKIN LOCKED</div>
+            <p class="lock-main">根本就没有这样的皮肤！</p>
+            <p class="lock-sub">不是我怕了</p>
+        </div>
+    </main>
+</div>
+
+<script src="https://aisearch-task.bj.bcebos.com/static/three-0.160.0.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+var $ = function(id){ return document.getElementById(id); };
+var HAS_3D = (typeof THREE !== 'undefined');
+var V3 = HAS_3D ? THREE.Vector3 : null;
+
+/* ============================ 配置 ============================ */
+var CFG = {
+    charH: 3.6,
+    moveSpeed: 5,
+    jumpV: 10.5,
+    gravity: -25,
+    bound: 27.5,
+    qiMax: 225,
+    qiRegen: 3,
+    atkDmg: 9.5,
+    atkRange: 4.8,
+    scareMaxHp: 1000,
+    cost1: 65, cost2: 125, cost3: 175,
+    mazeDuration: 15,
+    legionInterval: 35
+};
+
+/* ============================ 状态（单一数据源） ============================ */
+var state = {
+    category: 'normal',
+    qi: CFG.qiMax,
+    scareHp: CFG.scareMaxHp,
+    aim: false,
+    aimPoint: null,
+    mazeLeft: 0,
+    legionLeft: 0,
+    monsters: [],
+    running: false,
+    moving: false,
+    zoom: 1,
+    onGround: true,
+    vy: 0,
+    charAngle: 0,
+    walkPhase: 0,
+    walkAmp: 0
+};
+
+/* ============================ 侧栏 / HUD 渲染 ============================ */
+function renderUI(){
+    var p = Math.max(0, Math.min(1, state.qi / CFG.qiMax));
+    var qiFill = $('qiFill');
+    if (qiFill) qiFill.style.width = (p * 100).toFixed(1) + '%';
+    var qiNum = $('qiNum');
+    if (qiNum) qiNum.textContent = Math.round(state.qi) + ' / ' + CFG.qiMax;
+
+    var hp = state.scareHp;
+    var hpNum = $('hpNum');
+    if (hpNum) hpNum.textContent = hp.toFixed(1);
+    var wrap = $('hpNumWrap');
+    if (wrap) wrap.classList.toggle('neg', hp < 0);
+
+    var hpFill = $('hpFill');
+    if (hpFill){
+        var ratio = Math.min(1, Math.abs(hp) / CFG.scareMaxHp);
+        hpFill.style.width = (ratio * 100).toFixed(1) + '%';
+        if (hp < 0) hpFill.classList.add('neg');
+        else hpFill.classList.remove('neg');
+    }
+    var hpState = $('hpState');
+    if (hpState){
+        if (hp <= 0) hpState.textContent = '状态：已倒下（超额 ' + Math.abs(Math.min(0, hp)).toFixed(1) + '）';
+        else hpState.textContent = '状态：待机 · 抗伤测试中';
+    }
+
+    var slots = document.querySelectorAll('.slot');
+    for (var i = 0; i < slots.length; i++){
+        var act = slots[i].getAttribute('data-act');
+        var cost = act === 's1' ? CFG.cost1 : act === 's2' ? CFG.cost2 : act === 's3' ? CFG.cost3 : 0;
+        var lack = cost > 0 && state.qi < cost;
+        slots[i].classList.toggle('lack', lack);
+        if (act === 's3') slots[i].classList.toggle('armed', state.aim);
+    }
+
+    var hint = $('aimHint');
+    if (hint) hint.hidden = !state.aim;
+
+    var tag = $('mazeTag');
+    if (tag){
+        tag.hidden = state.mazeLeft <= 0;
+        var sec = $('mazeSec');
+        if (sec) sec.textContent = Math.ceil(state.mazeLeft);
+    }
+}
+
+var logSeq = 0;
+function pushLog(label, value){
+    var ul = $('logList');
+    if (!ul) return;
+    var li = document.createElement('li');
+    var s1 = document.createElement('span');
+    s1.textContent = label;
+    var b1 = document.createElement('b');
+    b1.textContent = value;
+    li.appendChild(s1);
+    li.appendChild(b1);
+    ul.insertBefore(li, ul.firstChild);
+    while (ul.children.length > 4) ul.removeChild(ul.lastChild);
+    logSeq++;
+    if (ul.parentNode) ul.parentNode.setAttribute('data-seq', String(logSeq));
+}
+
+function resetLog(){
+    var ul = $('logList');
+    if (!ul) return;
+    ul.innerHTML = '';
+    var li = document.createElement('li');
+    var s1 = document.createElement('span');
+    s1.textContent = '等待指令';
+    var b1 = document.createElement('b');
+    b1.textContent = '--';
+    li.appendChild(s1);
+    li.appendChild(b1);
+    ul.appendChild(li);
+    logSeq = 0;
+    if (ul.parentNode) ul.parentNode.setAttribute('data-seq', '0');
+}
+
+function showToast(msg){
+    var t = $('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    if (showToast._tid) clearTimeout(showToast._tid);
+    showToast._tid = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+/* ============================ 分类切换（统一刷新） ============================ */
+function applyCategory(cat){
+    state.category = cat;
+    var btns = document.querySelectorAll('.cat-btn');
+    for (var i = 0; i < btns.length; i++){
+        var on = btns[i].getAttribute('data-cat') === cat;
+        btns[i].classList.toggle('is-active', on);
+        btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+    var lock = $('lockView');
+    if (lock) lock.hidden = (cat === 'normal');
+
+    if (cat !== 'normal' && state.aim){
+        state.aim = false;
+    }
+    state.running = (cat === 'normal') && HAS_3D;
+    renderUI();
+}
+
+/* ============================ 3D 世界 ============================ */
+var renderer, scene, camera, clock;
+var charGroup, bodyRoot, armL, armR, foreL, foreR, legL, legR, shinL, shinR, headLight;
+var scarecrow, scareBar, scareFill, scareMats = [], scareTilt = 0;
+var groundMesh, aimRing;
+var solids = [];
+var fxList = [];
+var floaters = [];
+var rnd = (function(){ var a = 20261124; return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })();
+
+var MAT = {};
+
+function initMaterials(){
+    MAT.dark = new THREE.MeshStandardMaterial({ color:0x0c1015, roughness:0.52, metalness:0.38 });
+    MAT.darkSoft = new THREE.MeshStandardMaterial({ color:0x151b24, roughness:0.6, metalness:0.3 });
+    MAT.claw = new THREE.MeshStandardMaterial({ color:0xb9c9dd, roughness:0.22, metalness:0.62, emissive:0x2c4568, emissiveIntensity:0.85 });
+    MAT.smokeDark = new THREE.MeshStandardMaterial({ color:0x0a0d12, roughness:0.85, metalness:0.1, transparent:true, opacity:0.82 });
+    MAT.smokeSilver = new THREE.MeshStandardMaterial({ color:0x93a6bd, roughness:0.7, metalness:0.3, transparent:true, opacity:0.46 });
+    MAT.silver = new THREE.MeshStandardMaterial({ color:0xa9bdd6, roughness:0.28, metalness:0.6, emissive:0x22364f, emissiveIntensity:0.9 });
+    MAT.straw = new THREE.MeshStandardMaterial({ color:0xc9a227, roughness:0.95, metalness:0.02 });
+    MAT.wood = new THREE.MeshStandardMaterial({ color:0x6b4b2a, roughness:0.92, metalness:0.02 });
+    MAT.cloth = new THREE.MeshStandardMaterial({ color:0xd8c9ab, roughness:0.95, metalness:0.02 });
+    MAT.stoneA = new THREE.MeshStandardMaterial({ color:0x3a4048, roughness:0.9, metalness:0.08 });
+    MAT.stoneB = new THREE.MeshStandardMaterial({ color:0x2f353d, roughness:0.88, metalness:0.1 });
+    MAT.glowEdge = new THREE.MeshBasicMaterial({ color:0x9fc4ff });
+    MAT.ring = new THREE.MeshBasicMaterial({ color:0xcfe3ff, transparent:true, opacity:0.9, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false });
+    MAT.ringDark = new THREE.MeshBasicMaterial({ color:0x0a0d12, transparent:true, opacity:0.55, side:THREE.DoubleSide, depthWrite:false });
+    MAT.monsterEye = new THREE.MeshBasicMaterial({ color:0xdcecff });
+    MAT.mazeWall = new THREE.MeshStandardMaterial({ color:0x171d26, roughness:0.55, metalness:0.42 });
+    MAT.mazeTop = new THREE.MeshBasicMaterial({ color:0x86a8e0 });
+    MAT.trap = new THREE.MeshStandardMaterial({ color:0x8fa6c4, roughness:0.25, metalness:0.7, emissive:0x1d3050, emissiveIntensity:0.9 });
+}
+
+/* -------- 地面贴图：后室地毯 + 银灰网格 -------- */
+function makeFloorTexture(){
+    var c = document.createElement('canvas');
+    c.width = 256; c.height = 256;
+    var g = c.getContext('2d');
+    g.fillStyle = '#23252b';
+    g.fillRect(0, 0, 256, 256);
+    var i, x, y, n;
+    for (i = 0; i < 900; i++){
+        n = 26 + Math.floor(Math.random() * 26);
+        g.fillStyle = 'rgba(' + n + ',' + (n + 2) + ',' + (n + 7) + ',0.55)';
+        x = Math.random() * 256; y = Math.random() * 256;
+        g.fillRect(x, y, 2, 2);
+    }
+    g.strokeStyle = 'rgba(150,178,214,0.16)';
+    g.lineWidth = 2;
+    g.strokeRect(1, 1, 254, 254);
+    g.strokeStyle = 'rgba(150,178,214,0.07)';
+    g.lineWidth = 1;
+    for (i = 64; i < 256; i += 64){
+        g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 256); g.stroke();
+        g.beginPath(); g.moveTo(0, i); g.lineTo(256, i); g.stroke();
+    }
+    var tex = new THREE.CanvasTexture(c);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(13, 13);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+}
+
+/* -------- 六十七：脸部弧面贴图 -------- */
+function makeFaceTexture(){
+    var c = document.createElement('canvas');
+    c.width = 256; c.height = 256;
+    var g = c.getContext('2d');
+    g.clearRect(0, 0, 256, 256);
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.font = '900 148px "SF Mono",Menlo,Consolas,monospace';
+    g.shadowColor = 'rgba(206,228,255,0.95)';
+    g.shadowBlur = 40;
+    g.fillStyle = '#eaf3ff';
+    g.fillText('67', 128, 136);
+    g.shadowBlur = 18;
+    g.fillText('67', 128, 136);
+    g.shadowBlur = 0;
+    g.fillStyle = '#ffffff';
+    g.fillText('67', 128, 136);
+    var tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+}
+
+/* ============================ 角色构建 ============================ */
+function limb(parent, ax, ay, az, bx, by, bz, r, mat){
+    var a = new V3(ax, ay, az), b = new V3(bx, by, bz);
+    var dir = new V3().subVectors(b, a);
+    var len = dir.length();
+    var geo = new THREE.CylinderGeometry(r, r, len, 10, 1);
+    var m = new THREE.Mesh(geo, mat);
+    m.position.copy(a).addScaledVector(dir, 0.5);
+    m.quaternion.setFromUnitVectors(new V3(0, 1, 0), dir.clone().normalize());
+    parent.add(m);
+    var j = new THREE.Mesh(new THREE.SphereGeometry(r * 1.08, 12, 10), mat);
+    j.position.copy(a);
+    parent.add(j);
+    return m;
+}
+
+function addClaws(parent, x, y, z, len, mat, forward){
+    for (var i = -1; i <= 1; i++){
+        var geo = new THREE.ConeGeometry(0.05, len, 5, 1);
+        geo.rotateX(Math.PI);
+        geo.translate(0, -len / 2, 0);
+        var m = new THREE.Mesh(geo, mat);
+        m.position.set(x + i * 0.056, y, z + (forward ? 0.05 : 0));
+        m.rotation.z = i * 0.34;
+        m.rotation.x = forward ? -0.22 : 0.05;
+        parent.add(m);
+    }
+}
+
+/* 烟缕：垂直向上、细而微弯 */
+function tendril(parent, bx, by, bz, h, silver){
+    var pts = [];
+    var n = 5;
+    var p1 = rnd() * 6.28, p2 = rnd() * 6.28;
+    for (var i = 0; i <= n; i++){
+        var t = i / n;
+        var sw = Math.sin(t * 4.4 + p1) * 0.11 * t;
+        var sw2 = Math.cos(t * 3.6 + p2) * 0.075 * t;
+        pts.push(new V3(bx + sw, by + h * t, bz + sw2));
+    }
+    var curve = new THREE.CatmullRomCurve3(pts);
+    var geo = new THREE.TubeGeometry(curve, 14, silver ? 0.014 : 0.018, 5, false);
+    var m = new THREE.Mesh(geo, silver ? MAT.smokeSilver : MAT.smokeDark);
+    parent.add(m);
+}
+
+/* 在一段肢体外侧生成一簇烟缕 */
+function tendrilCluster(parent, ax, ay, az, bx, by, bz, outX, outZ, count, seedShift){
+    for (var i = 0; i < count; i++){
+        var t = 0.22 + (i / count) * 0.78;
+        var x = ax + (bx - ax) * t + outX * (0.85 + rnd() * 0.4);
+        var y = ay + (by - ay) * t;
+        var z = az + (bz - az) * t + outZ * (0.85 + rnd() * 0.4);
+        tendril(parent, x, y, z, 0.72 + rnd() * 0.62, (i + seedShift) % 3 === 0);
+    }
+}
+
+function buildCharacter(){
+    var root = new THREE.Group();
+    var body = new THREE.Group();
+    root.add(body);
+    bodyRoot = body;
+
+    /* 躯干与颈部 */
+    limb(body, 0, 2.96, 0, 0, 1.78, 0, 0.088, MAT.dark);
+    limb(body, 0, 3.12, 0, 0, 2.96, 0, 0.076, MAT.dark);
+    /* 肩线与髋线 */
+    limb(body, -0.30, 2.92, 0, 0.30, 2.92, 0, 0.062, MAT.dark);
+    limb(body, -0.14, 1.80, 0, 0.14, 1.80, 0, 0.058, MAT.dark);
+
+    /* 头部（纯黑空心头，无五官） */
+    var head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 30, 22), MAT.dark);
+    head.position.set(0, 3.36, 0);
+    body.add(head);
+
+    /* 脸部弧面：银光 67 */
+    var faceGeo = new THREE.SphereGeometry(0.2465, 30, 22, Math.PI / 2 - 0.46, 0.92, Math.PI / 2 - 0.44, 0.88);
+    var faceMat = new THREE.MeshBasicMaterial({ map: makeFaceTexture(), transparent:true, depthWrite:false });
+    var face = new THREE.Mesh(faceGeo, faceMat);
+    face.position.copy(head.position);
+    body.add(face);
+    var haloGeo = new THREE.SphereGeometry(0.28, 24, 18, Math.PI / 2 - 0.5, 1.0, Math.PI / 2 - 0.5, 1.0);
+    var haloMat = new THREE.MeshBasicMaterial({ color:0x8fb8ff, transparent:true, opacity:0.16, blending:THREE.AdditiveBlending, depthWrite:false, side:THREE.DoubleSide });
+    var halo = new THREE.Mesh(haloGeo, haloMat);
+    halo.position.copy(head.position);
+    body.add(halo);
+
+    /* 头部银光点光源 */
+    headLight = new THREE.PointLight(0xa8c8ff, 16, 9, 2);
+    headLight.position.set(0, 3.36, 0);
+    body.add(headLight);
+
+    /* 左臂 */
+    armL = new THREE.Group(); armL.position.set(-0.30, 2.92, 0); body.add(armL);
+    limb(armL, 0, 0, 0, -0.16, -0.90, 0, 0.076, MAT.dark);
+    foreL = new THREE.Group(); foreL.position.set(-0.16, -0.90, 0); armL.add(foreL);
+    limb(foreL, 0, 0, 0, -0.12, -0.84, 0, 0.068, MAT.dark);
+    addClaws(foreL, -0.12, -0.84, 0, 0.40, MAT.claw, false);
+    tendrilCluster(foreL, 0, 0, 0, -0.12, -0.84, 0, -0.09, 0, 6, 0);
+
+    /* 右臂 */
+    armR = new THREE.Group(); armR.position.set(0.30, 2.92, 0); body.add(armR);
+    limb(armR, 0, 0, 0, 0.16, -0.90, 0, 0.076, MAT.dark);
+    foreR = new THREE.Group(); foreR.position.set(0.16, -0.90, 0); armR.add(foreR);
+    limb(foreR, 0, 0, 0, 0.12, -0.84, 0, 0.068, MAT.dark);
+    addClaws(foreR, 0.12, -0.84, 0, 0.40, MAT.claw, false);
+    tendrilCluster(foreR, 0, 0, 0, 0.12, -0.84, 0, 0.09, 0, 6, 1);
+
+    /* 左腿 */
+    legL = new THREE.Group(); legL.position.set(-0.14, 1.80, 0); body.add(legL);
+    limb(legL, 0, 0, 0, -0.17, -0.82, 0, 0.086, MAT.dark);
+    shinL = new THREE.Group(); shinL.position.set(-0.17, -0.82, 0); legL.add(shinL);
+    limb(shinL, 0, 0, 0, -0.04, -0.58, 0, 0.072, MAT.dark);
+    addClaws(shinL, -0.04, -0.58, 0, 0.40, MAT.claw, true);
+    tendrilCluster(shinL, 0, 0, 0, -0.04, -0.58, 0, -0.09, 0, 6, 2);
+
+    /* 右腿 */
+    legR = new THREE.Group(); legR.position.set(0.14, 1.80, 0); body.add(legR);
+    limb(legR, 0, 0, 0, 0.17, -0.82, 0, 0.086, MAT.dark);
+    shinR = new THREE.Group(); shinR.position.set(0.17, -0.82, 0); legR.add(shinR);
+    limb(shinR, 0, 0, 0, 0.04, -0.58, 0, 0.072, MAT.dark);
+    addClaws(shinR, 0.04, -0.58, 0, 0.40, MAT.claw, true);
+    tendrilCluster(shinR, 0, 0, 0, 0.04, -0.58, 0, 0.09, 0, 6, 3);
+
+    /* 地面投影 */
+    var shGeo = new THREE.CircleGeometry(0.72, 26);
+    var shMat = new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:0.36, depthWrite:false });
+    var shadow = new THREE.Mesh(shGeo, shMat);
+    shadow.rotation.x = -Math.PI / 2;
+    shadow.position.y = 0.02;
+    root.add(shadow);
+    root.userData.shadow = shadow;
+
+    return root;
+}
+
+/* ============================ 稻草人 ============================ */
+function buildScarecrow(){
+    var g = new THREE.Group();
+    g.position.set(0, 0, -2);
+
+    var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 4.4, 10), MAT.wood);
+    pole.position.y = 2.2;
+    g.add(pole);
+
+    var armBar = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 2.6, 8), MAT.wood);
+    armBar.rotation.z = Math.PI / 2;
+    armBar.position.y = 2.85;
+    g.add(armBar);
+
+    var body = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.72, 1.5, 14), MAT.straw);
+    body.position.y = 2.1;
+    g.add(body);
+
+    var ropeA = new THREE.Mesh(new THREE.TorusGeometry(0.68, 0.035, 6, 18), MAT.wood);
+    ropeA.rotation.x = Math.PI / 2;
+    ropeA.position.y = 2.65;
+    g.add(ropeA);
+    var ropeB = ropeA.clone();
+    ropeB.position.y = 1.62;
+    g.add(ropeB);
+
+    var hd = new THREE.Mesh(new THREE.SphereGeometry(0.44, 18, 14), MAT.cloth);
+    hd.position.y = 3.3;
+    g.add(hd);
+
+    var hat = new THREE.Mesh(new THREE.ConeGeometry(0.6, 0.5, 16), MAT.wood);
+    hat.position.y = 3.72;
+    g.add(hat);
+    var brim = new THREE.Mesh(new THREE.CylinderGeometry(0.86, 0.86, 0.07, 20), MAT.wood);
+    brim.position.y = 3.5;
+    g.add(brim);
+
+    var armL2 = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.42, 0.42), MAT.straw);
+    armL2.position.set(-1.05, 2.85, 0);
+    armL2.rotation.z = 0.22;
+    g.add(armL2);
+    var armR2 = armL2.clone();
+    armR2.position.x = 1.05;
+    armR2.rotation.z = -0.22;
+    g.add(armR2);
+
+    /* 银色靶标 */
+    var bulls = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.035, 6, 20), MAT.silver);
+    bulls.position.set(0, 2.35, 0.62);
+    g.add(bulls);
+    var bulls2 = new THREE.Mesh(new THREE.CircleGeometry(0.09, 14), MAT.silver);
+    bulls2.position.set(0, 2.35, 0.62);
+    g.add(bulls2);
+
+    /* 头顶血条（billboard） */
+    scareBar = new THREE.Group();
+    scareBar.position.set(0, 5.05, 0);
+    var bg = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 0.26), new THREE.MeshBasicMaterial({ color:0x0b1018, transparent:true, opacity:0.82, side:THREE.DoubleSide }));
+    scareBar.add(bg);
+    var frame = new THREE.Mesh(new THREE.PlaneGeometry(2.62, 0.38), new THREE.MeshBasicMaterial({ color:0x8fb0d8, transparent:true, opacity:0.34, side:THREE.DoubleSide, depthWrite:false }));
+    frame.position.z = -0.01;
+    scareBar.add(frame);
+    scareFill = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 0.26), new THREE.MeshBasicMaterial({ color:0xff5e78, side:THREE.DoubleSide }));
+    scareFill.position.z = 0.012;
+    scareBar.add(scareFill);
+    g.add(scareBar);
+
+    var shGeo = new THREE.CircleGeometry(1.0, 26);
+    var shMat = new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:0.34, depthWrite:false });
+    var sh = new THREE.Mesh(shGeo, shMat);
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.02;
+    g.add(sh);
+
+    /* 收集材质用于受击闪光 */
+    scareMats = [MAT.straw, MAT.wood, MAT.cloth];
+    scareMats.forEach(function(m){ m.userData.baseEmissive = m.emissive ? m.emissive.getHex() : 0; });
+
+    /* 稻草人实体碰撞体：走近时有实体感 */
+    solids.push({
+        x0: g.position.x - 0.45, x1: g.position.x + 0.45,
+        y0: 0, y1: 4.3,
+        z0: g.position.z - 0.45, z1: g.position.z + 0.45
+    });
+
+    return g;
+}
+
+/* ============================ 地图 ============================ */
+function addSolid(cx, cy, cz, w, h, d, mat, glowTop){
+    var mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    mesh.position.set(cx, cy + h / 2, cz);
+    scene.add(mesh);
+    if (glowTop){
+        var cap = new THREE.Mesh(new THREE.BoxGeometry(w + 0.04, 0.055, d + 0.04), MAT.glowEdge);
+        cap.position.set(cx, cy + h + 0.02, cz);
+        scene.add(cap);
+    }
+    solids.push({ x0:cx - w / 2, x1:cx + w / 2, y0:cy, y1:cy + h, z0:cz - d / 2, z1:cz + d / 2 });
+    return mesh;
+}
+
+function buildMap(){
+    var size = 68;
+    var tex = makeFloorTexture();
+    var floorMat = new THREE.MeshStandardMaterial({ map:tex, roughness:0.94, metalness:0.06 });
+    groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(size, size), floorMat);
+    groundMesh.rotation.x = -Math.PI / 2;
+    scene.add(groundMesh);
+
+    /* 边界墙 */
+    var wallMat = new THREE.MeshStandardMaterial({ color:0x2a2f38, roughness:0.85, metalness:0.12 });
+    var half = size / 2 - 0.6;
+    var wh = 7;
+    [[0, -half, size, wh, 1.2], [0, half, size, wh, 1.2], [-half, 0, 1.2, wh, size], [half, 0, 1.2, wh, size]].forEach(function(w){
+        var m = new THREE.Mesh(new THREE.BoxGeometry(w[2], w[3], w[4]), wallMat);
+        m.position.set(w[0], w[3] / 2, w[1]);
+        scene.add(m);
+        var top = new THREE.Mesh(new THREE.BoxGeometry(w[2] + 0.05, 0.07, w[4] + 0.05), MAT.glowEdge);
+        top.position.set(w[0], w[3] + 0.02, w[1]);
+        scene.add(top);
+    });
+
+    /* 障碍柱 */
+    var pillars = [
+        [-10, -8, 3.2, 6.2, 3.2], [-15, 4, 2.4, 4.0, 2.4], [-6, 10, 2.8, 3.0, 2.8],
+        [11, -12, 3.0, 7.4, 3.0], [16, 6, 3.4, 5.0, 3.4], [7, 13, 2.6, 3.6, 2.6],
+        [-18, -16, 4.0, 8.4, 4.0], [19, -4, 2.5, 6.8, 2.5], [-3, -19, 3.0, 4.6, 3.0]
+    ];
+    pillars.forEach(function(p, i){
+        addSolid(p[0], 0, p[1], p[2], p[3], p[4], i % 2 ? MAT.stoneA : MAT.stoneB, true);
+    });
+
+    /* 悬浮台 */
+    /* [x, z, 边长, 厚度, 离地高度] —— 由低到高，低台可原地跳上 */
+    var floats = [
+        [8, -8, 4.6, 0.5, 1.3], [-11, 9, 4.0, 0.5, 2.0],
+        [0, 14, 5.0, 0.55, 3.4], [14, 1, 3.6, 0.5, 5.0]
+    ];
+    floats.forEach(function(f){
+        addSolid(f[0], f[4], f[1], f[2], f[3], f[2], MAT.stoneA, true);
+        /* 悬浮台底部银色吊柱 */
+        var hang = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, f[4], 8), MAT.silver);
+        hang.position.set(f[0], f[4] / 2, f[1]);
+        scene.add(hang);
+    });
+
+    /* 阶梯 */
+    for (var s = 0; s < 4; s++){
+        addSolid(-22 + s * 1.7, 0, 18, 1.7, 0.9 + s * 0.9, 3.0, MAT.stoneB, false);
+    }
+    for (var s2 = 0; s2 < 4; s2++){
+        addSolid(20, 0, -18 + s2 * 1.7, 3.0, 0.9 + s2 * 0.9, 1.7, MAT.stoneB, false);
+    }
+
+    /* 散落障碍 */
+    var blocks = [
+        [-4, 3, 1.6, 1.2, 1.6], [3, -6, 2.0, 1.8, 1.2], [-8, -2, 1.2, 2.6, 2.4],
+        [6, 5, 1.4, 0.8, 2.2], [-14, -4, 1.8, 3.2, 1.4], [12, 10, 2.2, 1.4, 2.2]
+    ];
+    blocks.forEach(function(b){
+        addSolid(b[0], 0, b[1], b[2], b[3], b[4], MAT.stoneA, false);
+    });
+
+    /* 选点指示环 */
+    aimRing = new THREE.Mesh(new THREE.RingGeometry(0.85, 1.15, 40), MAT.ring);
+    aimRing.rotation.x = -Math.PI / 2;
+    aimRing.position.y = 0.06;
+    aimRing.visible = false;
+    scene.add(aimRing);
+}
+
+/* ============================ 初始化 ============================ */
+function initThree(){
+    var canvas = $('scene');
+    renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x090c11);
+    scene.fog = new THREE.FogExp2(0x0a0e14, 0.017);
+
+    camera = new THREE.PerspectiveCamera(48, 1, 0.1, 400);
+    camera.position.set(0, 7, 16);
+
+    scene.add(new THREE.AmbientLight(0x6b7d95, 1.5));
+    var key = new THREE.DirectionalLight(0xdfe9ff, 2.3);
+    key.position.set(16, 24, 12);
+    scene.add(key);
+    var rim = new THREE.DirectionalLight(0x7fa8ff, 1.15);
+    rim.position.set(-14, 9, -18);
+    scene.add(rim);
+
+    initMaterials();
+    buildMap();
+
+    charGroup = buildCharacter();
+    charGroup.position.set(0, 0, 7);
+    scene.add(charGroup);
+
+    scarecrow = buildScarecrow();
+    scene.add(scarecrow);
+
+    clock = new THREE.Clock();
+    onResize();
+    renderUI();
+}
+
+/* ============================ 尺寸 ============================ */
+function onResize(){
+    if (!renderer) return;
+    var stage = $('stage');
+    var w = stage.clientWidth, h = stage.clientHeight;
+    if (w <= 0 || h <= 0) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+}
+
+/* ============================ 特效 ============================ */
+function addFx(obj, max, updater){
+    scene.add(obj);
+    fxList.push({ obj:obj, life:0, max:max, updater:updater });
+}
+
+function burst(pos, count, color, speed, size, life, up){
+    var positions = new Float32Array(count * 3);
+    var vel = [];
+    for (var i = 0; i < count; i++){
+        positions[i * 3] = pos.x;
+        positions[i * 3 + 1] = pos.y;
+        positions[i * 3 + 2] = pos.z;
+        var th = rnd() * Math.PI * 2;
+        var ph = Math.acos(2 * rnd() - 1);
+        var s = speed * (0.35 + rnd() * 0.75);
+        vel.push(new V3(Math.sin(ph) * Math.cos(th) * s, Math.abs(Math.cos(ph)) * s * 0.85 + (up || 0), Math.sin(ph) * Math.sin(th) * s));
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    var mat = new THREE.PointsMaterial({
+        color:color, size:size, transparent:true, opacity:1,
+        depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true
+    });
+    var pts = new THREE.Points(geo, mat);
+    addFx(pts, life, function(o, dt, f){
+        var arr = o.geometry.attributes.position.array;
+        for (var i = 0; i < vel.length; i++){
+            vel[i].y += CFG.gravity * 0.42 * dt;
+            arr[i * 3] += vel[i].x * dt;
+            arr[i * 3 + 1] += vel[i].y * dt;
+            arr[i * 3 + 2] += vel[i].z * dt;
+        }
+        o.geometry.attributes.position.needsUpdate = true;
+        o.material.opacity = Math.max(0, 1 - f);
+        o.material.size = size * (1 - f * 0.55);
+    });
+    return pts;
+}
+
+function slashFx(origin, angle){
+    var g = new THREE.Group();
+    g.position.copy(origin);
+    g.position.y = 2.1;
+    g.rotation.y = angle;
+
+    var arc = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.62, 30, 1, Math.PI * 0.62, Math.PI * 0.62), MAT.ring.clone());
+    arc.position.z = 1.5;
+    g.add(arc);
+
+    var arcDark = new THREE.Mesh(new THREE.RingGeometry(0.72, 1.02, 30, 1, Math.PI * 0.6, Math.PI * 0.66), MAT.ringDark.clone());
+    arcDark.position.z = 1.42;
+    g.add(arcDark);
+
+    addFx(g, 0.3, function(o, dt, f){
+        o.children[0].material.opacity = Math.max(0, 0.95 * (1 - f));
+        o.children[1].material.opacity = Math.max(0, 0.6 * (1 - f));
+        o.rotation.z = -0.85 + f * 1.7;
+        var sc = 0.78 + f * 0.7;
+        o.scale.setScalar(sc);
+        o.position.y = 2.1 - f * 0.35;
+    });
+
+    var fwd = new V3(Math.sin(angle), 0, Math.cos(angle));
+    var burstPos = origin.clone().addScaledVector(fwd, 1.9);
+    burstPos.y = 2.0;
+    burst(burstPos, 26, 0xd6e6ff, 5.2, 0.14, 0.5, 1.4);
+    burst(burstPos, 16, 0x2b3644, 4.0, 0.2, 0.55, 0.9);
+}
+
+function impactFx(pos){
+    var ring = new THREE.Mesh(new THREE.RingGeometry(0.28, 0.44, 34), MAT.ring.clone());
+    ring.position.copy(pos);
+    ring.lookAt(camera.position);
+    addFx(ring, 0.45, function(o, dt, f){
+        var s = 1 + f * 4.4;
+        o.scale.setScalar(s);
+        o.material.opacity = Math.max(0, 0.92 * (1 - f));
+    });
+
+    var ring2 = new THREE.Mesh(new THREE.RingGeometry(1.3, 1.62, 30, 1, Math.PI * 0.55, Math.PI * 0.7), MAT.ring.clone());
+    ring2.position.copy(pos);
+    ring2.lookAt(camera.position);
+    addFx(ring2, 0.36, function(o, dt, f){
+        o.material.opacity = Math.max(0, 0.75 * (1 - f));
+        o.rotation.z = f * 1.6;
+        o.scale.setScalar(0.8 + f * 1.1);
+    });
+
+    burst(pos, 34, 0xe4efff, 6.4, 0.16, 0.6, 2.0);
+    burst(pos, 20, 0x252f3d, 4.6, 0.24, 0.7, 1.2);
+}
+
+function castFx(pos){
+    var ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 1.5, 44), MAT.ring.clone());
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.copy(pos);
+    ring.position.y = 0.05;
+    addFx(ring, 0.6, function(o, dt, f){
+        o.material.opacity = Math.max(0, 0.85 * (1 - f));
+        o.scale.setScalar(0.5 + f * 1.6);
+        o.rotation.z += dt * 2.4;
+    });
+
+    var smoke = new THREE.Mesh(new THREE.SphereGeometry(0.9, 16, 12), new THREE.MeshBasicMaterial({ color:0x0b0f15, transparent:true, opacity:0.62, blending:THREE.AdditiveBlending, depthWrite:false }));
+    smoke.position.copy(pos);
+    smoke.position.y = 0.7;
+    addFx(smoke, 0.9, function(o, dt, f){
+        o.material.opacity = Math.max(0, 0.6 * (1 - f));
+        o.scale.set(0.6 + f * 1.6, 0.9 + f * 1.8, 0.6 + f * 1.6);
+        o.position.y = 0.7 + f * 1.5;
+    });
+    burst(pos.clone().setY(0.4), 22, 0xbfd8ff, 3.4, 0.13, 0.7, 3.2);
+}
+
+function summonFx(pos){
+    var pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 1.15, 6.4, 20, 1, true), new THREE.MeshBasicMaterial({ color:0x9ec8ff, transparent:true, opacity:0.42, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false }));
+    pillar.position.copy(pos);
+    pillar.position.y = 3.2;
+    addFx(pillar, 0.85, function(o, dt, f){
+        o.material.opacity = Math.max(0, 0.42 * (1 - f));
+        o.scale.set(1 - f * 0.5, 1 + f * 0.4, 1 - f * 0.5);
+    });
+    var ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 1.25, 40), MAT.ring.clone());
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.copy(pos);
+    ring.position.y = 0.07;
+    addFx(ring, 0.7, function(o, dt, f){
+        o.material.opacity = Math.max(0, 0.9 * (1 - f));
+        o.scale.setScalar(0.6 + f * 2.0);
+        o.rotation.z -= dt * 3.4;
+    });
+    burst(pos.clone().setY(1.0), 30, 0xd9e9ff, 5.0, 0.17, 0.8, 3.6);
+    burst(pos.clone().setY(0.6), 18, 0x141a24, 3.6, 0.26, 0.9, 2.4);
+}
+
+/* ============================ 飘字 ============================ */
+function floatDamage(worldPos, text, cls){
+    var layer = $('fxLayer');
+    if (!layer) return;
+    var el = document.createElement('div');
+    el.className = 'dmg ' + cls;
+    el.textContent = text;
+    layer.appendChild(el);
+    floaters.push({ el:el, pos:worldPos.clone(), life:0, max:1.15 });
+}
+
+function updateFloaters(dt){
+    var stage = $('stage');
+    var w = stage.clientWidth, h = stage.clientHeight;
+    for (var i = floaters.length - 1; i >= 0; i--){
+        var f = floaters[i];
+        f.life += dt;
+        var t = f.life / f.max;
+        if (t >= 1){ f.el.remove(); floaters.splice(i, 1); continue; }
+        var p = f.pos.clone();
+        p.y += t * 2.0;
+        var v = p.project(camera);
+        if (v.z > 1){ f.el.style.opacity = '0'; continue; }
+        f.el.style.left = ((v.x * 0.5 + 0.5) * w).toFixed(1) + 'px';
+        f.el.style.top = ((-v.y * 0.5 + 0.5) * h).toFixed(1) + 'px';
+        f.el.style.opacity = String(Math.max(0, 1 - t * t));
+        var sc = 1 + (1 - Math.min(1, t * 4)) * 0.5;
+        f.el.style.transform = 'translate(-50%,-50%) scale(' + sc.toFixed(2) + ')';
+    }
+}
+
+/* ============================ 伤害 ============================ */
+function damageScarecrow(amount, hitPos, isSkill){
+    state.scareHp -= amount;
+    var pos = hitPos || scarecrow.position.clone().setY(2.6);
+    impactFx(pos);
+    floatDamage(pos, '-' + amount.toFixed(1), isSkill ? 'dmg-skill' : 'dmg-hit');
+    scarecrow.userData.hitTimer = 0.22;
+    scareTilt = Math.min(0.9, scareTilt + amount / 260);
+    renderUI();
+}
+
+/* ============================ 怪物 ============================ */
+function buildMonster(){
+    var g = new THREE.Group();
+    var body = new THREE.Mesh(new THREE.SphereGeometry(0.45, 20, 16), MAT.darkSoft);
+    body.position.y = 0.68;
+    body.scale.set(1, 1.16, 1.06);
+    g.add(body);
+
+    for (var i = 0; i < 6; i++){
+        var spike = new THREE.Mesh(new THREE.ConeGeometry(0.075, 0.46, 6), MAT.silver);
+        var a = (i / 6) * Math.PI * 2;
+        var dirS = new V3(Math.sin(a), 0.24, Math.cos(a)).normalize();
+        spike.position.set(Math.sin(a) * 0.4, 0.72 + (i % 2) * 0.2, Math.cos(a) * 0.4);
+        spike.quaternion.setFromUnitVectors(new V3(0, 1, 0), dirS);
+        g.add(spike);
+    }
+    var eyeGeo = new THREE.SphereGeometry(0.085, 10, 8);
+    var e1 = new THREE.Mesh(eyeGeo, MAT.monsterEye);
+    e1.position.set(-0.15, 0.78, 0.4);
+    g.add(e1);
+    var e2 = new THREE.Mesh(eyeGeo, MAT.monsterEye);
+    e2.position.set(0.15, 0.78, 0.4);
+    g.add(e2);
+
+    for (var l = 0; l < 4; l++){
+        var a2 = (l / 4) * Math.PI * 2 + 0.4;
+        var leg = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.03, 0.68, 6), MAT.dark);
+        leg.position.set(Math.sin(a2) * 0.26, 0.34, Math.cos(a2) * 0.26);
+        leg.rotation.z = Math.sin(a2) * 0.22;
+        leg.rotation.x = -Math.cos(a2) * 0.22;
+        g.add(leg);
+    }
+    var sh = new THREE.Mesh(new THREE.CircleGeometry(0.44, 20), new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:0.34, depthWrite:false }));
+    sh.rotation.x = -Math.PI / 2;
+    sh.position.y = 0.02;
+    g.add(sh);
+    return g;
+}
+
+function spawnMonster(pos, powerful){
+    var g = buildMonster();
+    g.position.copy(pos);
+    g.position.y = 0;
+    scene.add(g);
+    var m = { obj:g, hp:100, life:powerful ? 60 : 26, atkCd:0.9, bob:rnd() * 6.28 };
+    state.monsters.push(m);
+    return m;
+}
+
+function updateMonsters(dt){
+    for (var i = state.monsters.length - 1; i >= 0; i--){
+        var m = state.monsters[i];
+        m.life -= dt;
+        if (m.life <= 0){
+            burst(m.obj.position.clone().setY(0.6), 18, 0x9fc0ff, 3.0, 0.14, 0.6, 1.6);
+            scene.remove(m.obj);
+            state.monsters.splice(i, 1);
+            continue;
+        }
+        var to = new V3().subVectors(scarecrow.position, m.obj.position);
+        to.y = 0;
+        var dist = to.length();
+        if (dist > 2.6){
+            to.normalize();
+            m.obj.position.addScaledVector(to, 2.6 * dt);
+            m.obj.position.x = Math.max(-CFG.bound, Math.min(CFG.bound, m.obj.position.x));
+            m.obj.position.z = Math.max(-CFG.bound, Math.min(CFG.bound, m.obj.position.z));
+            m.obj.rotation.y = Math.atan2(to.x, to.z);
+        } else {
+            m.atkCd -= dt;
+            if (m.atkCd <= 0){
+                m.atkCd = 1.5;
+                var hit = m.obj.position.clone();
+                hit.y = 1.9;
+                damageScarecrow(12, hit, false);
+            }
+        }
+        m.bob += dt * 4.2;
+        m.obj.children[0].position.y = 0.68 + Math.sin(m.bob) * 0.07;
+        m.obj.rotation.z = Math.sin(m.bob * 0.7) * 0.06;
+    }
+}
+
+/* ============================ 迷宫（二技能） ============================ */
+function buildMaze(center){
+    var group = new THREE.Group();
+    var cell = 2.2, cols = 5, rows = 5, wallH = 2.7, thick = 0.3;
+    var originX = center.x - (cols * cell) / 2;
+    var originZ = center.z - (rows * cell) / 2;
+    var walls = [];
+
+    function pushWall(cx, cz, w, d){
+        walls.push({ x:cx, y:wallH / 2, z:cz, sx:w, sz:d });
+    }
+    var i, j;
+    for (i = 0; i <= cols; i++){
+        for (j = 0; j < rows; j++){
+            var border = (i === 0 || i === cols);
+            if (!border && rnd() > 0.48) continue;
+            pushWall(originX + i * cell, originZ + j * cell + cell / 2, thick, cell);
+        }
+    }
+    for (j = 0; j <= rows; j++){
+        for (i = 0; i < cols; i++){
+            var border2 = (j === 0 || j === rows);
+            if (!border2 && rnd() > 0.48) continue;
+            pushWall(originX + i * cell + cell / 2, originZ + j * cell, cell, thick);
+        }
+    }
+
+    var geo = new THREE.BoxGeometry(1, wallH, 1);
+    var mesh = new THREE.InstancedMesh(geo, MAT.mazeWall, walls.length);
+    var capMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 0.07, 1), MAT.mazeTop, walls.length);
+    var dummy = new THREE.Object3D();
+    for (i = 0; i < walls.length; i++){
+        dummy.position.set(walls[i].x, walls[i].y, walls[i].z);
+        dummy.scale.set(walls[i].sx, 1, walls[i].sz);
+        dummy.rotation.set(0, 0, 0);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(i, dummy.matrix);
+        dummy.position.set(walls[i].x, wallH + 0.03, walls[i].z);
+        dummy.updateMatrix();
+        capMesh.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    capMesh.instanceMatrix.needsUpdate = true;
+    group.add(mesh);
+    group.add(capMesh);
+
+    /* 陷阱：银色地刺 */
+    for (i = 0; i < 10; i++){
+        var tx = originX + 0.7 + rnd() * (cols * cell - 1.4);
+        var tz = originZ + 0.7 + rnd() * (rows * cell - 1.4);
+        for (var k = 0; k < 3; k++){
+            var spike = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.62, 5), MAT.trap);
+            spike.position.set(tx + (k - 1) * 0.3, 0.31, tz);
+            group.add(spike);
+        }
+    }
+    return group;
+}
+
+function castMaze(){
+    if (state.maze){
+        scene.remove(state.maze);
+        state.maze = null;
+    }
+    state.maze = buildMaze(scarecrow.position.clone());
+    scene.add(state.maze);
+    state.mazeLeft = CFG.mazeDuration;
+    castFx(scarecrow.position.clone());
+    burst(scarecrow.position.clone().setY(1.4), 40, 0xcfe2ff, 6.0, 0.16, 0.9, 2.2);
+    damageScarecrow(30, scarecrow.position.clone().setY(2.6), true);
+    showToast('后室编程完成 · 迷宫持续 15 秒');
+}
+
+function updateMaze(dt){
+    if (!state.maze) return;
+    var prev = Math.ceil(state.mazeLeft);
+    state.mazeLeft -= dt;
+    var now = Math.ceil(state.mazeLeft);
+    if (now !== prev){
+        var sec = $('mazeSec');
+        if (sec) sec.textContent = Math.max(0, now);
+    }
+    if (state.mazeLeft <= 0){
+        scene.remove(state.maze);
+        state.maze = null;
+        state.mazeLeft = 0;
+        burst(scarecrow.position.clone().setY(1.2), 26, 0x9fc4ff, 4.0, 0.15, 0.7, 1.2);
+        showToast('迷宫消散');
+        renderUI();
+    }
+}
+
+/* ============================ 怪物军团（三技能） ============================ */
+function castLegion(point){
+    castFx(point.clone());
+    state.legion = { pos: point.clone(), ring: null };
+    var ring = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.4, 46), MAT.ring.clone());
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.copy(point);
+    ring.position.y = 0.08;
+    scene.add(ring);
+    state.legion.ring = ring;
+
+    for (var i = 0; i < 3; i++){
+        var p = point.clone();
+        p.x += (rnd() - 0.5) * 1.6;
+        p.z += (rnd() - 0.5) * 1.6;
+        spawnMonster(p, true);
+        summonFx(p.clone());
+    }
+    state.legionLeft = CFG.legionInterval;
+    damageScarecrow(15, point.clone().setY(2.0), true);
+    showToast('怪物军团已建立 · 每 35 秒补充一只');
+}
+
+function updateLegion(dt){
+    if (!state.legion) return;
+    if (state.legion.ring){
+        state.legion.ring.rotation.z += dt * 0.9;
+        state.legion.ring.material.opacity = 0.45 + Math.sin(clock.elapsedTime * 2.4) * 0.22;
+    }
+    state.legionLeft -= dt;
+    if (state.legionLeft <= 0){
+        state.legionLeft = CFG.legionInterval;
+        var p = state.legion.pos.clone();
+        p.x += (rnd() - 0.5) * 1.6;
+        p.z += (rnd() - 0.5) * 1.6;
+        spawnMonster(p, true);
+        summonFx(p);
+        showToast('军团补充：一只怪物已入场');
+    }
+}
+
+/* ============================ 攻击 / 技能 ============================ */
+function doAttack(){
+    if (state.category !== 'normal'){
+        showToast('该皮肤不可操作');
+        pushLog('普攻被拒绝', '皮肤锁定');
+        return;
+    }
+    if (!HAS_3D){
+        pushLog('普攻', '3D 未就绪');
+        return;
+    }
+    var fwd = new V3(Math.sin(state.charAngle), 0, Math.cos(state.charAngle));
+    var origin = charGroup.position.clone();
+    slashFx(origin, state.charAngle);
+
+    var toS = new V3().subVectors(scarecrow.position, origin);
+    var dist = Math.hypot(toS.x, toS.z);
+    var flat = new V3(toS.x, 0, toS.z).normalize();
+    if (dist <= CFG.atkRange && fwd.dot(flat) > 0.05){
+        var hit = origin.clone().addScaledVector(fwd, Math.min(dist, CFG.atkRange) * 0.72);
+        hit.y = 2.2;
+        damageScarecrow(CFG.atkDmg, hit, false);
+        pushLog('普攻 · 命中稻草人', '-' + CFG.atkDmg.toFixed(1));
+    } else {
+        pushLog('普攻 · 银黑斩击', CFG.atkDmg.toFixed(1) + ' 伤害');
+    }
+}
+
+function castSkill(n){
+    if (state.category !== 'normal'){
+        showToast('该皮肤不可操作');
+        pushLog('技能被拒绝', '皮肤锁定');
+        return;
+    }
+    if (!HAS_3D){
+        pushLog('技能', '3D 未就绪');
+        return;
+    }
+    if (n === 1){
+        if (state.qi < CFG.cost1){ showToast('犇气不足 · 需要 ' + CFG.cost1); pushLog('一技能 · 犇气不足', '需要 ' + CFG.cost1); return; }
+        state.qi -= CFG.cost1;
+        var p = charGroup.position.clone();
+        p.x += (rnd() - 0.5) * 2.2;
+        p.z += (rnd() - 0.5) * 2.2;
+        castFx(p.clone());
+        spawnMonster(p, false);
+        var sp = p.clone(); sp.y = 0.6;
+        summonFx(sp);
+        showToast('召唤怪物：一只后室怪物加入战斗');
+        pushLog('一技能 · 召唤怪物', '-' + CFG.cost1 + ' 犇气');
+        renderUI();
+    } else if (n === 2){
+        if (state.qi < CFG.cost2){ showToast('犇气不足 · 需要 ' + CFG.cost2); pushLog('二技能 · 犇气不足', '需要 ' + CFG.cost2); return; }
+        state.qi -= CFG.cost2;
+        castMaze();
+        pushLog('二技能 · 后室编程', '-' + CFG.cost2 + ' 犇气');
+        renderUI();
+    } else if (n === 3){
+        if (state.qi < CFG.cost3){ showToast('犇气不足 · 需要 ' + CFG.cost3); pushLog('三技能 · 犇气不足', '需要 ' + CFG.cost3); return; }
+        state.aim = true;
+        renderUI();
+        pushLog('三技能 · 等待选点', CFG.cost3 + ' 犇气');
+        showToast('选点模式：点击地面确定军团集结点');
+    }
+}
+
+function confirmAim(){
+    if (!state.aim) return;
+    if (state.qi < CFG.cost3){ showToast('犇气不足 · 需要 ' + CFG.cost3); pushLog('三技能 · 犇气不足', '需要 ' + CFG.cost3); state.aim = false; renderUI(); return; }
+    state.qi -= CFG.cost3;
+    var pt = state.aimPoint ? state.aimPoint.clone() : charGroup.position.clone();
+    castLegion(pt);
+    state.aim = false;
+    aimRing.visible = false;
+    pushLog('三技能 · 怪物军团', '-' + CFG.cost3 + ' 犇气');
+    renderUI();
+}
+
+/* ============================ 移动与物理 ============================ */
+var keys = {};
+
+function collides(x, y, z){
+    var r = 0.36;
+    var y0 = y + 0.06, y1 = y + CFG.charH * 0.9;
+    for (var i = 0; i < solids.length; i++){
+        var s = solids[i];
+        if (x + r <= s.x0 || x - r >= s.x1) continue;
+        if (z + r <= s.z0 || z - r >= s.z1) continue;
+        if (y1 <= s.y0 || y0 >= s.y1) continue;
+        return true;
+    }
+    return false;
+}
+
+function supportHeight(x, z, prevY, newY){
+    var r = 0.36;
+    var best = 0;
+    for (var i = 0; i < solids.length; i++){
+        var s = solids[i];
+        if (x + r <= s.x0 || x - r >= s.x1) continue;
+        if (z + r <= s.z0 || z - r >= s.z1) continue;
+        if (prevY >= s.y1 - 0.02 && newY <= s.y1 + 0.02){
+            if (s.y1 > best) best = s.y1;
+        }
+    }
+    return best;
+}
+
+function updateCharacter(dt){
+    var dx = 0, dz = 0;
+    if (keys.KeyW || keys.ArrowUp) dz -= 1;
+    if (keys.KeyS || keys.ArrowDown) dz += 1;
+    if (keys.KeyA || keys.ArrowLeft) dx -= 1;
+    if (keys.KeyD || keys.ArrowRight) dx += 1;
+
+    var moving = (dx !== 0 || dz !== 0);
+    state.moving = moving;
+
+    if (moving){
+        var len = Math.hypot(dx, dz);
+        dx /= len; dz /= len;
+        var step = CFG.moveSpeed * dt;
+        var nx = charGroup.position.x + dx * step;
+        if (!collides(nx, charGroup.position.y, charGroup.position.z)) charGroup.position.x = nx;
+        var nz = charGroup.position.z + dz * step;
+        if (!collides(charGroup.position.x, charGroup.position.y, nz)) charGroup.position.z = nz;
+
+        charGroup.position.x = Math.max(-CFG.bound, Math.min(CFG.bound, charGroup.position.x));
+        charGroup.position.z = Math.max(-CFG.bound, Math.min(CFG.bound, charGroup.position.z));
+
+        var target = Math.atan2(dx, dz);
+        var diff = ((target - state.charAngle + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+        state.charAngle += diff * Math.min(1, dt * 12);
+    }
+    charGroup.rotation.y = state.charAngle;
+
+    /* 跳跃与重力 */
+    if (keys.Space && state.onGround){
+        state.vy = CFG.jumpV;
+        state.onGround = false;
+    }
+    var prevY = charGroup.position.y;
+    state.vy += CFG.gravity * dt;
+    var newY = prevY + state.vy * dt;
+    var ground = supportHeight(charGroup.position.x, charGroup.position.z, prevY, newY);
+    if (newY <= ground){
+        newY = ground;
+        state.vy = 0;
+        state.onGround = true;
+    } else {
+        state.onGround = false;
+    }
+    charGroup.position.y = newY;
+
+    /* 移动时视觉上小一点 */
+    var targetScale = moving ? 0.93 : 1.0;
+    var k = Math.min(1, dt * 8);
+    bodyRoot.scale.x += (targetScale - bodyRoot.scale.x) * k;
+    bodyRoot.scale.y = bodyRoot.scale.x;
+    bodyRoot.scale.z = bodyRoot.scale.x;
+
+    /* 走路摆动 */
+    var ampTarget = (moving && state.onGround) ? 0.52 : 0;
+    state.walkAmp += (ampTarget - state.walkAmp) * Math.min(1, dt * 9);
+    state.walkPhase += dt * (moving ? 9 : 3);
+    var sw = Math.sin(state.walkPhase) * state.walkAmp;
+    armL.rotation.x = sw;
+    armR.rotation.x = -sw;
+    legL.rotation.x = -sw * 0.85;
+    legR.rotation.x = sw * 0.85;
+    if (!state.onGround){
+        armL.rotation.x = -0.5;
+        armR.rotation.x = -0.5;
+        legL.rotation.x = 0.35;
+        legR.rotation.x = -0.25;
+    }
+
+    /* 影子（落在当前支撑面上） */
+    var shadow = charGroup.userData.shadow;
+    if (shadow){
+        var h = charGroup.position.y - ground;
+        shadow.position.y = ground - charGroup.position.y + 0.02;
+        var sc = Math.max(0.4, 1 - h * 0.08);
+        shadow.scale.setScalar(sc);
+        shadow.material.opacity = Math.max(0.06, 0.36 - h * 0.03);
+    }
+}
+
+function updateCamera(dt){
+    var zoom = state.zoom;
+    if (state.moving) zoom *= 1.1;
+    var off = new V3(0, 7.0, 10.6).multiplyScalar(zoom);
+    var target = charGroup.position.clone().add(off);
+    var k = 1 - Math.pow(0.0016, dt);
+    camera.position.lerp(target, k);
+    var look = new V3(charGroup.position.x, charGroup.position.y + 1.95, charGroup.position.z);
+    camera.lookAt(look);
+}
+
+/* ============================ 主循环 ============================ */
+var mazeTick = 0;
+
+function update(dt){
+    updateCharacter(dt);
+    updateCamera(dt);
+    updateMonsters(dt);
+    updateMaze(dt);
+    updateLegion(dt);
+
+    /* 犇气恢复（仅在整数变化时刷新 UI） */
+    if (state.qi < CFG.qiMax){
+        var prevQi = Math.round(state.qi);
+        state.qi = Math.min(CFG.qiMax, state.qi + CFG.qiRegen * dt);
+        if (Math.round(state.qi) !== prevQi) renderUI();
+    }
+
+    /* 稻草人受击闪光与倒下 */
+    if (scarecrow){
+        scareBar.quaternion.copy(camera.quaternion);
+        var ratio = state.scareHp / CFG.scareMaxHp;
+        var s = Math.max(-1.6, Math.min(1, ratio));
+        scareFill.scale.x = s === 0 ? 0.0001 : s;
+        scareFill.position.x = -1.25 + s * 1.25;
+        if (state.scareHp < 0) scareFill.material.color.setHex(0x8b5cf6);
+        else if (state.scareHp < CFG.scareMaxHp * 0.2) scareFill.material.color.setHex(0xff3d5c);
+        else if (state.scareHp < CFG.scareMaxHp * 0.5) scareFill.material.color.setHex(0xff8a3d);
+        else scareFill.material.color.setHex(0xff5e78);
+
+        var hitT = scarecrow.userData.hitTimer || 0;
+        if (hitT > 0){
+            scarecrow.userData.hitTimer = hitT - dt;
+            var g = Math.max(0, hitT / 0.22);
+            scareMats.forEach(function(m){
+                if (m.emissive) m.emissive.setRGB(0.55 * g, 0.72 * g, 0.95 * g);
+            });
+        } else {
+            scareMats.forEach(function(m){
+                if (m.emissive) m.emissive.setRGB(0, 0, 0);
+            });
+        }
+
+        var targetTilt = state.scareHp <= 0 ? 1.15 : 0;
+        scareTilt += (targetTilt - scareTilt) * Math.min(1, dt * 3.2);
+        scarecrow.rotation.x = scareTilt * 0.72;
+    }
+
+    /* 特效推进 */
+    for (var i = fxList.length - 1; i >= 0; i--){
+        var f = fxList[i];
+        f.life += dt;
+        var t = f.life / f.max;
+        if (t >= 1){
+            scene.remove(f.obj);
+            if (f.obj.geometry) f.obj.geometry.dispose();
+            if (f.obj.material){
+                if (f.obj.material.map) f.obj.material.map.dispose();
+                f.obj.material.dispose();
+            }
+            fxList.splice(i, 1);
+            continue;
+        }
+        if (f.updater) f.updater(f.obj, dt, t);
+    }
+
+    updateFloaters(dt);
+
+    /* 选点指示环呼吸 */
+    if (aimRing && state.aim){
+        aimRing.rotation.z += dt * 1.2;
+    }
+
+    /* 悬念：顶点动画 */
+    if (headLight) headLight.intensity = 14 + Math.sin(clock.elapsedTime * 3.1) * 3.4;
+}
+
+function animate(){
+    requestAnimationFrame(animate);
+    var dt = Math.min(clock.getDelta(), 0.1);
+    if (!state.running) return;
+    update(dt);
+    renderer.render(scene, camera);
+}
+
+/* ============================ 输入绑定 ============================ */
+function bindInput(){
+    var catRow = $('catRow');
+    if (catRow){
+        catRow.addEventListener('click', function(e){
+            var btn = e.target.closest ? e.target.closest('.cat-btn') : null;
+            if (!btn) return;
+            applyCategory(btn.getAttribute('data-cat'));
+        });
+    }
+
+    var skillbar = document.querySelector('.skillbar');
+    if (skillbar){
+        skillbar.addEventListener('click', function(e){
+            var slot = e.target.closest ? e.target.closest('.slot') : null;
+            if (!slot) return;
+            var act = slot.getAttribute('data-act');
+            if (act === 'atk') doAttack();
+            else if (act === 's1') castSkill(1);
+            else if (act === 's2') castSkill(2);
+            else if (act === 's3') castSkill(3);
+        });
+    }
+
+    var reset = $('btnReset');
+    if (reset){
+        reset.addEventListener('click', function(){
+            state.qi = CFG.qiMax;
+            state.scareHp = CFG.scareMaxHp;
+            state.aim = false;
+            scareTilt = 0;
+            if (scarecrow) scarecrow.userData.hitTimer = 0;
+            if (state.maze){ scene.remove(state.maze); state.maze = null; }
+            state.mazeLeft = 0;
+            if (state.legion && state.legion.ring){ scene.remove(state.legion.ring); }
+            state.legion = null;
+            state.legionLeft = 0;
+            state.monsters.forEach(function(m){ scene.remove(m.obj); });
+            state.monsters = [];
+            if (aimRing) aimRing.visible = false;
+            resetLog();
+            renderUI();
+            showToast('场景已重置');
+            pushLog('场景重置', '1000 / 225');
+        });
+    }
+
+    var canvas = $('scene');
+    var ndc = HAS_3D ? new THREE.Vector2(0, 0) : null;
+
+    function toNDC(clientX, clientY){
+        var r = canvas.getBoundingClientRect();
+        ndc.x = ((clientX - r.left) / r.width) * 2 - 1;
+        ndc.y = -((clientY - r.top) / r.height) * 2 + 1;
+    }
+
+    canvas.addEventListener('mousemove', function(e){
+        if (!HAS_3D || !state.aim) return;
+        toNDC(e.clientX, e.clientY);
+        var rc = new THREE.Raycaster();
+        rc.setFromCamera(ndc, camera);
+        var plane = new THREE.Plane(new V3(0, 1, 0), 0);
+        var hit = new V3();
+        if (rc.ray.intersectPlane(plane, hit)){
+            hit.x = Math.max(-CFG.bound, Math.min(CFG.bound, hit.x));
+            hit.z = Math.max(-CFG.bound, Math.min(CFG.bound, hit.z));
+            hit.y = 0;
+            state.aimPoint = hit;
+            if (aimRing){ aimRing.position.copy(hit); aimRing.visible = true; }
+        }
+    });
+
+    canvas.addEventListener('mousedown', function(e){
+        if (!HAS_3D || state.category !== 'normal') return;
+        if (e.button !== 0) return;
+        if (state.aim) confirmAim();
+        else doAttack();
+    });
+
+    canvas.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+    canvas.addEventListener('wheel', function(e){
+        e.preventDefault();
+        state.zoom = Math.max(0.55, Math.min(2.0, state.zoom + e.deltaY * 0.0009));
+    }, { passive:false });
+
+    window.addEventListener('keydown', function(e){
+        var c = e.code || '';
+        if (c === 'Space' || c.indexOf('Arrow') === 0) e.preventDefault();
+        keys[c] = true;
+        if (c === 'KeyJ') doAttack();
+        if (c === 'Digit1') castSkill(1);
+        if (c === 'Digit2') castSkill(2);
+        if (c === 'Digit3') castSkill(3);
+        if (c === 'Escape' && state.aim){
+            state.aim = false;
+            if (aimRing) aimRing.visible = false;
+            renderUI();
+            showToast('已退出选点模式');
+        }
+        if (c === 'KeyR'){
+            var rb = $('btnReset');
+            if (rb) rb.click();
+        }
+    });
+    window.addEventListener('keyup', function(e){
+        keys[e.code || ''] = false;
+    });
+    window.addEventListener('blur', function(){
+        keys = {};
+    });
+    window.addEventListener('resize', onResize);
+}
+
+/* ============================ 启动 ============================ */
+bindInput();
+applyCategory('normal');
+
+if (HAS_3D){
+    try{
+        initThree();
+        state.running = true;
+        animate();
+    } catch (err){
+        state.running = false;
+        showToast('3D 场景初始化失败，请刷新页面重试');
+        if (window.console && console.error) console.error(err);
+    }
+} else {
+    showToast('3D 引擎未能加载，请联网后刷新页面');
+}
+
+})();
+</script>
+</body>
+</html>
